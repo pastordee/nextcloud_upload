@@ -303,8 +303,10 @@ Share shareFromShareXml(xml.XmlElement element) {
   final shareWithDisplayName = element.findAllElements('share_with_displayname').single.innerText;
   final mailSend = int.parse(element.findAllElements('mail_send').single.innerText);
   final hideDownload = int.parse(element.findAllElements('hide_download').single.innerText);
-  final password = element.findAllElements('password').toList()[0].innerText;
-  final url = element.findAllElements('url').toList()[0].innerText;
+  final passwordElements = element.findAllElements('password').toList();
+  final password = passwordElements.isNotEmpty ? passwordElements.first.innerText : '';
+  final urlElements = element.findAllElements('url').toList();
+  final url = urlElements.isNotEmpty ? urlElements.first.innerText : '';
   final permissionsNumber = int.parse(element.findAllElements('permissions').single.innerText);
   final permissions = Permissions.fromInt(permissionsNumber);
 

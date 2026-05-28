@@ -28,7 +28,7 @@ class SharesClient {
   }) async {
     var url = _getUrl('/shares?reshares=$reshares&subfiles=$subfiles');
     if (path != null) {
-      url += '&path=$path';
+      url += '&path=${Uri.encodeQueryComponent(path)}';
     }
     final response = await _network.send('GET', url, [200]);
     return sharesFromResponse(response.body);
@@ -65,12 +65,12 @@ class SharesClient {
     }
     permissions ??= Permissions([Permission.all]);
     var url = _getUrl(
-      '/shares?path=$path&shareType=$shareType&publicUpload=$publicUpload&permissions=${permissions.toInt()}',
+      '/shares?path=${Uri.encodeQueryComponent(path)}&shareType=$shareType&publicUpload=$publicUpload&permissions=${permissions.toInt()}',
     );
     if (shareType == ShareTypes.user || shareType == ShareTypes.group) {
-      url += '&shareWith=$shareWith';
+      url += '&shareWith=${Uri.encodeQueryComponent(shareWith!)}';
     } else if (shareType == ShareTypes.publicLink && password != null) {
-      url += '&password=$password';
+      url += '&password=${Uri.encodeQueryComponent(password)}';
     }
     final response = await _network.send('POST', url, [200]);
     return shareFromResponse(response.body);

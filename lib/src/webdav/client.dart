@@ -14,7 +14,7 @@ class WebDavClient {
   final String _davUrl;
   final Network _network;
 
-  Future<String> _getUrl(String path) async {
+  String _getUrl(String path) {
     path = path.trim();
     if (path.startsWith('/')) {
       path = path.substring(1);
@@ -48,7 +48,7 @@ class WebDavClient {
       201,
       if (safe) ...[301, 405],
     ];
-    return _send('MKCOL', await _getUrl(path), expectedCodes);
+    return _send('MKCOL', _getUrl(path), expectedCodes);
   }
 
   /// Recursively create all directories in [path], like `mkdir -p`.
@@ -82,7 +82,7 @@ class WebDavClient {
   }) async =>
       _send(
         'PUT',
-        await _getUrl(remotePath),
+        _getUrl(remotePath),
         [200, 201, 204],
         data: localData,
         onUploadProgress: onUploadProgress,
@@ -91,7 +91,7 @@ class WebDavClient {
   /// Download the file at [remotePath] and return its bytes.
   Future<Uint8List> download(String remotePath) async => (await _send(
         'GET',
-        await _getUrl(remotePath),
+        _getUrl(remotePath),
         [200],
       ))
           .bodyBytes;
@@ -99,7 +99,7 @@ class WebDavClient {
   /// Delete the file or directory at [remotePath].
   Future delete(String remotePath) async => _send(
         'DELETE',
-        await _getUrl(remotePath),
+        _getUrl(remotePath),
         [204],
       );
 

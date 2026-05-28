@@ -277,24 +277,37 @@ class Network {
     Map<String, String>? headers,
     ProgressCallback? onUploadProgress,
   }) async {
-    final request = http.Request(method, Uri.parse(url))
-      ..followRedirects = false
-      ..persistentConnection = true
-      ..headers.addAll(headers ?? {});
+    final http.BaseRequest request;
 
     if (data != null && data.isNotEmpty && onUploadProgress != null) {
       final totalBytes = data.length;
-      var sentBytes = 0;
-      final stream = Stream.fromIterable(data.map((byte) {
-        sentBytes++;
-        if (sentBytes % 1024 == 0 || sentBytes == totalBytes) {
-          onUploadProgress(sentBytes, totalBytes);
+      const chunkSize = 65536;
+      final streamed = http.StreamedRequest(method, Uri.parse(url))
+        ..followRedirects = false
+        ..persistentConnection = true
+        ..contentLength = totalBytes
+        ..headers.addAll(headers ?? {});
+
+      Future.sync(() async {
+        var offset = 0;
+        while (offset < totalBytes) {
+          final end = (offset + chunkSize).clamp(0, totalBytes);
+          streamed.sink.add(data.sublist(offset, end));
+          offset = end;
+          onUploadProgress(offset, totalBytes);
         }
-        return [byte];
-      })).expand((chunk) => chunk);
-      request.bodyBytes = await stream.toList().then(Uint8List.fromList);
+        await streamed.sink.close();
+      }).catchError((Object e, StackTrace st) {
+        streamed.sink.addError(e, st);
+      });
+
+      request = streamed;
     } else {
-      request.bodyBytes = data ?? Uint8List(0);
+      request = http.Request(method, Uri.parse(url))
+        ..followRedirects = false
+        ..persistentConnection = true
+        ..headers.addAll(headers ?? {})
+        ..bodyBytes = data ?? Uint8List(0);
     }
 
     final response = await _client.send(request);
