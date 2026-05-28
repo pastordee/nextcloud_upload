@@ -88,6 +88,14 @@ class WebDavClient {
         onUploadProgress: onUploadProgress,
       );
 
+  /// Download the file at [remotePath] and return its bytes.
+  Future<Uint8List> download(String remotePath) async => (await _send(
+        'GET',
+        await _getUrl(remotePath),
+        [200],
+      ))
+          .bodyBytes;
+
   /// Delete the file or directory at [remotePath].
   Future delete(String remotePath) async => _send(
         'DELETE',
