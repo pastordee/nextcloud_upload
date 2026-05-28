@@ -1,6 +1,7 @@
 name: nextcloud_upload
 version: 1.0.0
 description: A minimal Nextcloud client for file upload and share creation.
+repository: https://github.com/pastordee/nextcloud_upload
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
