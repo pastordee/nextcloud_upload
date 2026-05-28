@@ -1,0 +1,19 @@
+# Dart/Flutter
+.dart_tool/
+.packages
+build/
+*.js
+*.js.map
+*.js.deps
+*.js.info
+
+# pub
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
