@@ -20,11 +20,31 @@ class SharesClient {
     return [_baseUrl, path].join();
   }
 
+  /// Get all shares, optionally filtered by [path].
+  Future<List<Share>> getShares({
+    String? path,
+    bool reshares = false,
+    bool subfiles = false,
+  }) async {
+    var url = _getUrl('/shares?reshares=$reshares&subfiles=$subfiles');
+    if (path != null) {
+      url += '&path=$path';
+    }
+    final response = await _network.send('GET', url, [200]);
+    return sharesFromResponse(response.body);
+  }
+
   /// Retrieve a share by [id].
   Future<Share> getShare(int id) async {
     final url = _getUrl('/shares/$id');
     final response = await _network.send('GET', url, [200]);
     return sharesFromResponse(response.body).single;
+  }
+
+  /// Delete a share by [id].
+  Future deleteShare(int id) async {
+    final url = _getUrl('/shares/$id');
+    await _network.send('DELETE', url, [200]);
   }
 
   Future<Share> _createShare(

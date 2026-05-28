@@ -87,4 +87,34 @@ class WebDavClient {
         data: localData,
         onUploadProgress: onUploadProgress,
       );
+
+  /// Delete the file or directory at [remotePath].
+  Future delete(String remotePath) async => _send(
+        'DELETE',
+        await _getUrl(remotePath),
+        [204],
+      );
+
+  /// Returns the WebDAV capabilities of the server.
+  Future<WebDavStatus> status() async {
+    final response = await _send('OPTIONS', _davUrl, [200]);
+    final davCapabilities = response.headers['dav'] ?? '';
+    final davSearchCapabilities = response.headers['dasl'] ?? '';
+    return WebDavStatus(
+      davCapabilities.split(',').map((e) => e.trim()).toSet(),
+      davSearchCapabilities.split(',').map((e) => e.trim()).toSet(),
+    );
+  }
+}
+
+/// WebDAV server capabilities.
+class WebDavStatus {
+  // ignore: public_member_api_docs
+  WebDavStatus(this.capabilities, this.searchCapabilities);
+
+  /// DAV capabilities from the server 'dav' header.
+  Set<String> capabilities;
+
+  /// DAV search capabilities from the server 'dasl' header.
+  Set<String> searchCapabilities;
 }
