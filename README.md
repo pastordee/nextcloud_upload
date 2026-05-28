@@ -161,4 +161,4 @@ try {
 }
 ```
 
-Rate-limited requests (HTTP 429) are automatically retried up to 3 times with exponential backoff. Server errors (5xx) are also retried!
+Rate-limited requests (HTTP 429) are automatically retried up to 3 times with exponential backoff. Server errors (5xx) are also retried.
